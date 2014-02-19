@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -38,7 +38,7 @@ import org.apache.catalina.security.SecurityUtil;
 import org.jboss.servlet.http.UpgradableHttpServletResponse;
 
 /**
- * Facade class that wraps a Coyote response object. 
+ * Facade class that wraps a Coyote response object.
  * All methods are delegated to the wrapped response.
  *
  * @author Remy Maucherat
@@ -46,12 +46,12 @@ import org.jboss.servlet.http.UpgradableHttpServletResponse;
  * @version $Revision: 2025 $ $Date: 2012-04-16 12:24:28 +0200 (Mon, 16 Apr 2012) $
  */
 @SuppressWarnings("deprecation")
-public class ResponseFacade 
+public class ResponseFacade
     implements HttpServletResponse, UpgradableHttpServletResponse {
 
 
     // ----------------------------------------------------------- DoPrivileged
-    
+
     private final class SetContentTypePrivilegedAction
             implements PrivilegedAction {
 
@@ -60,11 +60,11 @@ public class ResponseFacade
         public SetContentTypePrivilegedAction(String contentType){
             this.contentType = contentType;
         }
-        
+
         public Object run() {
             response.setContentType(contentType);
             return null;
-        }            
+        }
     }
 
     private final class DateHeaderPrivilegedAction
@@ -89,7 +89,7 @@ public class ResponseFacade
             return null;
         }
     }
-    
+
     // ----------------------------------------------------------- Constructors
 
 
@@ -174,8 +174,10 @@ public class ResponseFacade
         //                (/*sm.getString("responseFacade.finished")*/);
 
         ServletOutputStream sos = response.getOutputStream();
-        if (isFinished())
+        if (isFinished()) {
+            System.out.println("=====> " + Thread.currentThread() + " getOutputStream - is finished");
             response.setSuspended(true);
+        }
         return (sos);
 
     }
@@ -210,11 +212,11 @@ public class ResponseFacade
 
         if (isCommitted())
             return;
-        
+
         if (SecurityUtil.isPackageProtectionEnabled()){
             AccessController.doPrivileged(new SetContentTypePrivilegedAction(type));
         } else {
-            response.setContentType(type);            
+            response.setContentType(type);
         }
     }
 
@@ -268,7 +270,7 @@ public class ResponseFacade
         } else {
             response.setAppCommitted(true);
 
-            response.flushBuffer();            
+            response.flushBuffer();
         }
 
     }
@@ -427,7 +429,7 @@ public class ResponseFacade
     }
 
     public void sendFile(String path, String absolutePath, long start, long end) {
-        
+
         if (isCommitted())
             throw new IllegalStateException
                 (/*sm.getString("responseBase.reset.ise")*/);
@@ -439,7 +441,7 @@ public class ResponseFacade
     }
 
     public void startUpgrade() {
-        
+
         if (isCommitted())
             throw new IllegalStateException
                 (/*sm.getString("responseBase.reset.ise")*/);
@@ -450,7 +452,7 @@ public class ResponseFacade
 
     public void sendUpgrade()
             throws IOException {
-        
+
         if (isCommitted())
             throw new IllegalStateException
                 (/*sm.getString("responseBase.reset.ise")*/);
